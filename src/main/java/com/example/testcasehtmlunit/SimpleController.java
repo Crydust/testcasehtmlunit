@@ -38,7 +38,7 @@ public class SimpleController {
 
     @GetMapping
     @ResponseBody
-    public String doGet(@SessionAttribute(name = "submittedForm", required = false) String submittedForm) {
+    public String doGet(@SessionAttribute(name = "submittedForm", required = false) String submittedForm, HttpSession session) {
         return HTML_TEMPLATE.formatted(requireNonNullElse(submittedForm, "none"));
     }
 
