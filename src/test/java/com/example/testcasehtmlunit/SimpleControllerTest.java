@@ -75,4 +75,15 @@ public class SimpleControllerTest {
         assertThat(submittedForm, is("4"));
     }
 
+    @Test
+    void shouldHandleForm5() {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        driver.findElement(By.cssSelector("#form5 button")).click();
+
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        assertThat(submittedForm, is("5"));
+    }
+
 }

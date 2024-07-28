@@ -32,6 +32,9 @@ public class SimpleController {
                 <form action="?" method="post" id="form4">
                     <p><button type="submit" formaction="?form=4" name="dummy" value="foo">Submit form <b>4</b> (button has query parameter in formaction and has irrelevant name and value)</button></p>
                 </form>
+                <form action="?form=5" method="post" id="form5" enctype="multipart/form-data">
+                    <p><button type="submit" name="dummy" value="foo">Submit form <b>5</b> (form has query parameter in action, enctype is multipart/form-data)</button></p>
+                </form>
             </body>
             </html>
             """;
@@ -62,6 +65,12 @@ public class SimpleController {
 
     @PostMapping(params = "form=4")
     public String handleForm4(String form, HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        return "redirect:/";
+    }
+
+    @PostMapping(params = "form=5")
+    public String handleForm5(String form, HttpSession session) {
         session.setAttribute("submittedForm", form);
         return "redirect:/";
     }
