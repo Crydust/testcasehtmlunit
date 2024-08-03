@@ -19,13 +19,19 @@ repositories {
 	maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
+// alternatively use "gradle build --refresh-dependencies" to force refresh
+configurations.all {
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'org.seleniumhq.selenium:selenium-java'
 	testImplementation 'org.seleniumhq.selenium:htmlunit3-driver'
-	testImplementation 'org.htmlunit:htmlunit:4.5.0-SNAPSHOT'
+//	testImplementation 'org.htmlunit:htmlunit:4.5.0-SNAPSHOT'
+	testImplementation group: 'org.htmlunit', name: 'htmlunit', version: '4.5.0-SNAPSHOT', changing: true
 }
 
 tasks.named('test') {
