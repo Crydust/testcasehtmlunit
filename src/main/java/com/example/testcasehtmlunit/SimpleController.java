@@ -71,8 +71,9 @@ public class SimpleController {
                         <button type="submit" name="form" value="9">Submit form <b>9</b> (simple form, multiple values for 'x' checkbox, enctype is multipart/form-data)</button>
                     </p>
                 </form>
-                <form action="?form=10" method="post" id="form10" enctype="multipart/form-data">
+                <form action="?" method="post" id="form10" enctype="multipart/form-data">
                     <p>
+                        <input type="hidden" name="form" value="10">
                         file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
                         <button type="submit">Submit form <b>10</b> (form with file input, enctype is multipart/form-data)</button>
                     </p>
