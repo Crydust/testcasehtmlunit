@@ -1,9 +1,12 @@
 package com.example.testcasehtmlunit;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,10 +15,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 /**
  * When using HtmlUnit ...
@@ -30,6 +36,13 @@ public class SimpleControllerTest {
 
     @Autowired
     WebDriver driver;
+
+    @BeforeEach
+    void setUp() {
+        if (driver instanceof HtmlUnitDriver h) {
+            h.getWebClient().getOptions().setFetchPolyfillEnabled(true);
+        }
+    }
 
     @Test
     void shouldDoGet() {
@@ -119,7 +132,6 @@ public class SimpleControllerTest {
 
     @Test
     void shouldHandleForm8() {
-        // fails with HtmlUnitRequestBuilder
         driver.get("http://localhost:8080/");
 
         driver.findElement(By.cssSelector("#form8 button")).click();
@@ -135,7 +147,6 @@ public class SimpleControllerTest {
 
     @Test
     void shouldHandleForm9() {
-        // fails with HtmlUnitRequestBuilder
         driver.get("http://localhost:8080/");
 
         driver.findElement(By.cssSelector("#form9 button")).click();
@@ -150,7 +161,6 @@ public class SimpleControllerTest {
 
     @Test
     void shouldHandleForm10(@TempDir Path tempDir) throws IOException {
-        // fails with HtmlUnitRequestBuilder
         driver.get("http://localhost:8080/");
 
         Path tempFile = tempDir.resolve("example.txt");
@@ -167,6 +177,59 @@ public class SimpleControllerTest {
                 () -> assertThat(fileName, is("example.txt")),
                 () -> assertThat(fileContents, is("Hello world!"))
         );
+    }
+
+    @Test
+    void shouldHandleForm11() {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        driver.findElement(By.cssSelector("#form11 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("11")),
+                () -> assertThat(valuesOfX, is("query, body"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm12() {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        driver.findElement(By.cssSelector("#form12 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("12")),
+                () -> assertThat(valuesOfX, is("query, body"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm13() {
+        // doesn't fail with HtmlUnitRequestBuilder because it uses POST instead of PATCH
+        driver.get("http://localhost:8080/");
+
+        driver.findElement(By.cssSelector("#form13 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("13")),
+                () -> assertThat(valuesOfX, is("query, body"))
+        );
+    }
+
+    private void waitUntilAjaxFinished() {
+        new WebDriverWait(driver, Duration.of(5, ChronoUnit.SECONDS))
+                .until(visibilityOfElementLocated(By.id("fileContents")));
     }
 
 }

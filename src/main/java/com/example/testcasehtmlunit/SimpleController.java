@@ -1,20 +1,25 @@
 package com.example.testcasehtmlunit;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNullElse;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 @Controller
 @RequestMapping("/")
 public class SimpleController {
 
+    // language=HTML
     private static final String HTML_TEMPLATE = """
             <!DOCTYPE html>
             <html lang="en">
@@ -78,9 +83,50 @@ public class SimpleController {
                         <button type="submit">Submit form <b>10</b> (form with file input, enctype is multipart/form-data)</button>
                     </p>
                 </form>
+                <div id="form11">
+                    <p><button type="button" onclick="submitForm('11', 'PUT');">Submit form <b>11</b> (put method with javascript)</button></p>
+                </div>
+                <div id="form12">
+                    <p><button type="button" onclick="submitForm('12', 'DELETE');">Submit form <b>12</b> (delete method with javascript)</button></p>
+                </div>
+                <div id="form13">
+                    <p><button type="button" onclick="submitForm('13', 'PATCH');">Submit form <b>13</b> (patch method with javascript, warning: PATCH is weird)</button></p>
+                </div>
+                <script>
+                    function submitForm(form, method) {
+                        let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
+                        ids.forEach(id => document.getElementById(id).style.display = 'none');
+                        ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
+                        let body = {
+                            'x': 'body'
+                        };
+                        // for some reason spring boot dislikes the "patch" method
+                        if (method === 'PATCH') {
+                            method = 'POST';
+                            body['_method'] = 'PATCH';
+                        }
+                        fetch('?form=' + encodeURIComponent(form) + '&x=query', {
+                            'method': method,
+                            'headers': {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'Accept': 'application/json'
+                            },
+                            'body': new URLSearchParams(body)
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('HTTP error, status = ' + response.status);
+                                }
+                                return response.json();
+                            })
+                            .then(data => ids.forEach(id => document.getElementById(id).textContent = data[id]))
+                            .catch(error => ids.forEach(id => document.getElementById(id).textContent = 'Error! ' + error))
+                            .finally(() => ids.forEach(id => document.getElementById(id).style.display = ''));
+                    }
+                </script>
             </body>
             </html>
-            """;
+""";
 
     @GetMapping
     @ResponseBody
@@ -191,6 +237,45 @@ public class SimpleController {
             session.setAttribute("fileContents", new String(file.getBytes(), StandardCharsets.US_ASCII));
         }
         return "redirect:/";
+    }
+
+    @PutMapping(params = "form=11", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm11(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
+    }
+
+    @DeleteMapping(params = "form=12", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm12(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
+    }
+
+    @PatchMapping(params = "form=13", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm13(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
     }
 
 }
