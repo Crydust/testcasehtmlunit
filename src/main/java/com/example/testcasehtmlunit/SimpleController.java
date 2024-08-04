@@ -9,8 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNullElse;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 @Controller
@@ -93,18 +97,41 @@ public class SimpleController {
                 <div id="form14">
                     <p><button type="button" onclick="submitForm('14', 'OPTIONS');">Submit form <b>14</b> (options method with javascript)</button></p>
                 </div>
+                <div id="form15">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFile('15', 'PUT');">Submit form <b>15</b> (put method with javascript)</button>
+                    </p>
+                </div>
+                <div id="form16">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFile('16', 'DELETE');">Submit form <b>16</b> (delete method with javascript)</button>
+                    </p>
+                </div>
+                <div id="form17">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFile('17', 'PATCH');">Submit form <b>17</b> (patch method with javascript, warning: PATCH is weird)</button>
+                    </p>
+                </div>
+                <div id="form18">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFile('18', 'OPTIONS');">Submit form <b>18</b> (options method with javascript)</button>
+                    </p>
+                </div>
                 <script>
                     function submitForm(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
                         ids.forEach(id => document.getElementById(id).style.display = 'none');
                         ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
-                        let body = {
-                            'x': 'body'
-                        };
+                        let body = new URLSearchParams();
+                        body.append('x', 'body');
                         // for some reason spring boot dislikes the "patch" method
                         if (method === 'PATCH') {
                             method = 'POST';
-                            body['_method'] = 'PATCH';
+                            body.append('_method', 'PATCH');
                         }
                         let xhr = new XMLHttpRequest();
                         xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
@@ -117,12 +144,41 @@ public class SimpleController {
                                 ids.forEach(id => document.getElementById(id).style.display = '');
                             }
                         };
-                        xhr.send(new URLSearchParams(body).toString());
+                        xhr.send(body);
+                    }
+                    function submitFormWithFile(form, method) {
+                        let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
+                        ids.forEach(id => document.getElementById(id).style.display = 'none');
+                        ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
+                        let body = new FormData();
+                        body.append('x', 'body');
+                        let fileInput = document.querySelector('#form' + form + ' input[name="file"]');
+                        if (fileInput.files.length !== 0) {
+                            body.append('file', fileInput.files[0]);
+                        }
+                        // for some reason spring boot dislikes the "patch" method
+                        if (method === 'PATCH') {
+                            method = 'POST';
+                            body.append('_method', 'PATCH');
+                        }
+                        let xhr = new XMLHttpRequest();
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        // Warning: do NOT set the Content-Type header yourself!
+                        // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+                        xhr.setRequestHeader('Accept', 'application/json');
+                        xhr.onreadystatechange = () => {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                const data = JSON.parse(xhr.responseText);
+                                ids.forEach(id => document.getElementById(id).textContent = data[id]);
+                                ids.forEach(id => document.getElementById(id).style.display = '');
+                            }
+                        };
+                        xhr.send(body);
                     }
                 </script>
             </body>
             </html>
-""";
+            """;
 
     @GetMapping
     @ResponseBody
@@ -229,13 +285,13 @@ public class SimpleController {
             HttpSession session) throws IOException {
         session.setAttribute("submittedForm", form);
         if (file != null && !file.isEmpty()) {
-            session.setAttribute("fileName", file.getOriginalFilename());
+            session.setAttribute("fileName", requireNonNullElse(file.getOriginalFilename(), "null"));
             session.setAttribute("fileContents", new String(file.getBytes(), StandardCharsets.US_ASCII));
         }
         return "redirect:/";
     }
 
-    @PutMapping(params = "form=11", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(params = "form=11", produces = APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, String> handleForm11(
             String form,
@@ -248,7 +304,7 @@ public class SimpleController {
         );
     }
 
-    @DeleteMapping(params = "form=12", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(params = "form=12", produces = APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, String> handleForm12(
             String form,
@@ -261,7 +317,7 @@ public class SimpleController {
         );
     }
 
-    @PatchMapping(params = "form=13", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(params = "form=13", produces = APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, String> handleForm13(
             String form,
@@ -274,7 +330,7 @@ public class SimpleController {
         );
     }
 
-    @RequestMapping(method = RequestMethod.OPTIONS, params = "form=14", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = OPTIONS, params = "form=14", produces = APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, String> handleForm14(
             String form,
@@ -287,4 +343,59 @@ public class SimpleController {
         );
     }
 
+    @PutMapping(params = "form=15", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm15(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @DeleteMapping(params = "form=16", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm16(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @PatchMapping(params = "form=17", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm17(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @RequestMapping(method = OPTIONS, params = "form=18", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm18(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
 }
