@@ -96,7 +96,6 @@ public class SimpleController {
                     function submitForm(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
                         ids.forEach(id => document.getElementById(id).style.display = 'none');
-                        ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
                         let body = {
                             'x': 'body'
                         };
@@ -105,23 +104,18 @@ public class SimpleController {
                             method = 'POST';
                             body['_method'] = 'PATCH';
                         }
-                        fetch('?form=' + encodeURIComponent(form) + '&x=query', {
-                            'method': method,
-                            'headers': {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                                'Accept': 'application/json'
-                            },
-                            'body': new URLSearchParams(body)
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('HTTP error, status = ' + response.status);
-                                }
-                                return response.json();
-                            })
-                            .then(data => ids.forEach(id => document.getElementById(id).textContent = data[id]))
-                            .catch(error => ids.forEach(id => document.getElementById(id).textContent = 'Error! ' + error))
-                            .finally(() => ids.forEach(id => document.getElementById(id).style.display = ''));
+                        let xhr = new XMLHttpRequest();
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                        xhr.setRequestHeader('Accept', 'application/json');
+                        xhr.onreadystatechange = () => {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                const data = JSON.parse(xhr.responseText);
+                                ids.forEach(id => document.getElementById(id).textContent = data[id]);
+                                ids.forEach(id => document.getElementById(id).style.display = '');
+                            }
+                        };
+                        xhr.send(new URLSearchParams(body).toString());
                     }
                 </script>
             </body>

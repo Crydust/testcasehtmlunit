@@ -37,12 +37,12 @@ public class SimpleControllerTest {
     @Autowired
     WebDriver driver;
 
-    @BeforeEach
-    void setUp() {
-        if (driver instanceof HtmlUnitDriver h) {
-            h.getWebClient().getOptions().setFetchPolyfillEnabled(true);
-        }
-    }
+//    @BeforeEach
+//    void setUp() {
+//        if (driver instanceof HtmlUnitDriver h) {
+//            h.getWebClient().getOptions().setFetchPolyfillEnabled(true);
+//        }
+//    }
 
     @Test
     void shouldDoGet() {
@@ -181,7 +181,6 @@ public class SimpleControllerTest {
 
     @Test
     void shouldHandleForm11() {
-        // fails with HtmlUnitRequestBuilder
         driver.get("http://localhost:8080/");
 
         driver.findElement(By.cssSelector("#form11 button")).click();
@@ -213,7 +212,7 @@ public class SimpleControllerTest {
 
     @Test
     void shouldHandleForm13() {
-        // doesn't fail with HtmlUnitRequestBuilder because it uses POST instead of PATCH
+        // fails with HtmlUnitRequestBuilder
         driver.get("http://localhost:8080/");
 
         driver.findElement(By.cssSelector("#form13 button")).click();
