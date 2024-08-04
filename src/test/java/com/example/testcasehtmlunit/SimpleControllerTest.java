@@ -226,6 +226,23 @@ public class SimpleControllerTest {
         );
     }
 
+    @Test
+    void shouldHandleForm14() {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        driver.findElement(By.cssSelector("#form14 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("14")),
+                // WARNING: options method ignores body parameters
+                () -> assertThat(valuesOfX, is("query"))
+        );
+    }
+
     private void waitUntilAjaxFinished() {
         new WebDriverWait(driver, Duration.of(5, ChronoUnit.SECONDS))
                 .until(visibilityOfElementLocated(By.id("fileContents")));

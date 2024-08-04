@@ -11,8 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNullElse;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 @Controller
@@ -92,10 +90,14 @@ public class SimpleController {
                 <div id="form13">
                     <p><button type="button" onclick="submitForm('13', 'PATCH');">Submit form <b>13</b> (patch method with javascript, warning: PATCH is weird)</button></p>
                 </div>
+                <div id="form14">
+                    <p><button type="button" onclick="submitForm('14', 'OPTIONS');">Submit form <b>14</b> (options method with javascript)</button></p>
+                </div>
                 <script>
                     function submitForm(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
                         ids.forEach(id => document.getElementById(id).style.display = 'none');
+                        ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
                         let body = {
                             'x': 'body'
                         };
@@ -262,6 +264,19 @@ public class SimpleController {
     @PatchMapping(params = "form=13", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, String> handleForm13(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
+    }
+
+    @RequestMapping(method = RequestMethod.OPTIONS, params = "form=14", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm14(
             String form,
             @RequestParam(name = "x", required = false) String[] x) {
         return Map.of(
