@@ -1,11 +1,9 @@
 package com.example.testcasehtmlunit;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,13 +34,6 @@ public class SimpleControllerTest {
 
     @Autowired
     WebDriver driver;
-
-//    @BeforeEach
-//    void setUp() {
-//        if (driver instanceof HtmlUnitDriver h) {
-//            h.getWebClient().getOptions().setFetchPolyfillEnabled(true);
-//        }
-//    }
 
     @Test
     void shouldDoGet() {
