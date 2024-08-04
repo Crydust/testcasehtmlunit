@@ -133,6 +133,7 @@ public class SimpleControllerTest {
 
     @Test
     void shouldHandleForm8() {
+        // fails with HtmlUnitRequestBuilder
         driver.get("http://localhost:8080/");
 
         driver.findElement(By.cssSelector("#form8 button")).click();
@@ -142,7 +143,9 @@ public class SimpleControllerTest {
         assertAll(
                 () -> assertThat(submittedForm, is("8")),
                 // WARNING: the order is different from "shouldHandleForm6"
-                () -> assertThat(valuesOfX, is("hidden, button, query"))
+                // ... but only when running this test with HtmlUnit
+                // ... when submitting this form with firefox or chrome the output is "query, hidden, button"
+                () -> assertThat(valuesOfX, is("query, hidden, button"))
         );
     }
 
