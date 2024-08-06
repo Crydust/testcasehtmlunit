@@ -16,7 +16,9 @@ java {
 repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+	// we want to use our own snapshot version of htmlunit
+	mavenLocal()
+//	maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 // alternatively use "gradle build --refresh-dependencies" to force refresh
