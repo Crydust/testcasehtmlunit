@@ -254,6 +254,7 @@ public class SimpleControllerTest {
         String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
         assertAll(
                 () -> assertThat(submittedForm, is("15")),
+                // WARNING: options method ignores body parameters
                 () -> assertThat(valuesOfX, is("body, query")),
                 () -> assertThat(fileName, is("example.txt")),
                 () -> assertThat(fileContents, is("Hello world!"))

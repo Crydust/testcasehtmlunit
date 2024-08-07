@@ -1,21 +1,20 @@
 package com.example.testcasehtmlunit;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNullElse;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 @Controller
@@ -135,7 +134,7 @@ public class SimpleController {
                             body.append('_method', 'PATCH');
                         }
                         let xhr = new XMLHttpRequest();
-                        xhr.open(method, '/bounce?form=' + encodeURIComponent(form) + '&x=query', true);
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
                         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                         xhr.setRequestHeader('Accept', 'application/json');
                         xhr.onreadystatechange = () => {
@@ -163,7 +162,7 @@ public class SimpleController {
                             body.append('_method', 'PATCH');
                         }
                         let xhr = new XMLHttpRequest();
-                        xhr.open(method, '/bounce?form=' + encodeURIComponent(form) + '&x=query', true);
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
                         // Warning: do NOT set the Content-Type header yourself!
                         // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
                         xhr.setRequestHeader('Accept', 'application/json');
@@ -201,239 +200,202 @@ public class SimpleController {
         );
     }
 
-//    @PostMapping(params = "form=1")
-//    public String handleForm1(String form, HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=2")
-//    public String handleForm2(String form, HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=3")
-//    public String handleForm3(String form, HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=4")
-//    public String handleForm4(String form, HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=5")
-//    public String handleForm5(String form, HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=6")
-//    public String handleForm6(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        if (x != null) {
-//            session.setAttribute("valuesOfX", String.join(", ", x));
-//        }
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=7")
-//    public String handleForm7(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        if (x != null) {
-//            session.setAttribute("valuesOfX", String.join(", ", x));
-//        }
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=8")
-//    public String handleForm8(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        if (x != null) {
-//            session.setAttribute("valuesOfX", String.join(", ", x));
-//        }
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=9")
-//    public String handleForm9(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            HttpSession session) {
-//        session.setAttribute("submittedForm", form);
-//        if (x != null) {
-//            session.setAttribute("valuesOfX", String.join(", ", x));
-//        }
-//        return "redirect:/";
-//    }
-//
-//    @PostMapping(params = "form=10")
-//    public String handleForm10(
-//            String form,
-//            @RequestParam(name= "file", required = false) MultipartFile file,
-//            HttpSession session) throws IOException {
-//        session.setAttribute("submittedForm", form);
-//        if (file != null && !file.isEmpty()) {
-//            session.setAttribute("fileName", requireNonNullElse(file.getOriginalFilename(), "null"));
-//            session.setAttribute("fileContents", new String(file.getBytes(), StandardCharsets.US_ASCII));
-//        }
-//        return "redirect:/";
-//    }
-//
-//    @PutMapping(params = "form=11", produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm11(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x) {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", "none",
-//                "fileContents", "none"
-//        );
-//    }
-//
-//    @DeleteMapping(params = "form=12", produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm12(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x) {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", "none",
-//                "fileContents", "none"
-//        );
-//    }
-//
-//    @PatchMapping(params = "form=13", produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm13(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x) {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", "none",
-//                "fileContents", "none"
-//        );
-//    }
-//
-//    @RequestMapping(method = OPTIONS, params = "form=14", produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm14(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x) {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", "none",
-//                "fileContents", "none"
-//        );
-//    }
-//
-//    @PutMapping(params = "form=15", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm15(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
-//                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
-//        );
-//    }
-//
-//    @DeleteMapping(params = "form=16", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm16(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
-//                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
-//        );
-//    }
-//
-//    @PatchMapping(params = "form=17", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm17(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
-//                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
-//        );
-//    }
-//
-//    @RequestMapping(method = OPTIONS, params = "form=18", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public Map<String, String> handleForm18(
-//            String form,
-//            @RequestParam(name = "x", required = false) String[] x,
-//            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-//        return Map.of(
-//                "submittedForm", form,
-//                "valuesOfX", String.join(", ", x),
-//                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
-//                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
-//        );
-//    }
+    @PostMapping(params = "form=1")
+    public String handleForm1(String form, HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        return "redirect:/";
+    }
 
-    @RequestMapping(
-            params = "bounce=t",
-            method = {GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE},
-            produces = TEXT_PLAIN_VALUE)
-    @ResponseBody
-    public String bounce(
-            NativeWebRequest request,
-            @RequestParam(name = "data", required = false) MultipartFile data) {
-        StringWriter writer = new StringWriter();
-        writer.write("Parameters: \n");
+    @PostMapping(params = "form=2")
+    public String handleForm2(String form, HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        return "redirect:/";
+    }
 
-        // use only getParameterMap() here because we like to have the same behavior
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        for (final Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-            if (entry.getValue() == null) {
-                writer.write("  '" + entry.getKey() + "': [null]\n");
-            } else if (entry.getValue().length == 0) {
-                writer.write("  '" + entry.getKey() + "': []\n");
-            } else {
-                writer.write("  '" + entry.getKey() + "': [");
-                boolean first = true;
-                for (final String val : entry.getValue()) {
-                    if (first) {
-                        writer.write("'" + val + "'");
-                        first = false;
-                    } else {
-                        writer.write(", '" + val + "'");
-                    }
-                }
-                writer.write("]\n");
-            }
+    @PostMapping(params = "form=3")
+    public String handleForm3(String form, HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        return "redirect:/";
+    }
+
+    @PostMapping(params = "form=4")
+    public String handleForm4(String form, HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        return "redirect:/";
+    }
+
+    @PostMapping(params = "form=5")
+    public String handleForm5(String form, HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        return "redirect:/";
+    }
+
+    @PostMapping(params = "form=6")
+    public String handleForm6(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        if (x != null) {
+            session.setAttribute("valuesOfX", String.join(", ", x));
         }
-        writer.write("data = "+data+"\n");
+        return "redirect:/";
+    }
 
-        return writer.toString();
+    @PostMapping(params = "form=7")
+    public String handleForm7(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        if (x != null) {
+            session.setAttribute("valuesOfX", String.join(", ", x));
+        }
+        return "redirect:/";
+    }
+
+    @PostMapping(params = "form=8")
+    public String handleForm8(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        if (x != null) {
+            session.setAttribute("valuesOfX", String.join(", ", x));
+        }
+        return "redirect:/";
+    }
+
+    @PostMapping(params = "form=9")
+    public String handleForm9(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            HttpSession session) {
+        session.setAttribute("submittedForm", form);
+        if (x != null) {
+            session.setAttribute("valuesOfX", String.join(", ", x));
+        }
+        return "redirect:/";
+    }
+
+    @PostMapping(params = "form=10")
+    public String handleForm10(
+            String form,
+            @RequestParam(name= "file", required = false) MultipartFile file,
+            HttpSession session) throws IOException {
+        session.setAttribute("submittedForm", form);
+        if (file != null && !file.isEmpty()) {
+            session.setAttribute("fileName", requireNonNullElse(file.getOriginalFilename(), "null"));
+            session.setAttribute("fileContents", new String(file.getBytes(), StandardCharsets.US_ASCII));
+        }
+        return "redirect:/";
+    }
+
+    @PutMapping(params = "form=11", produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm11(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
+    }
+
+    @DeleteMapping(params = "form=12", produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm12(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
+    }
+
+    @PatchMapping(params = "form=13", produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm13(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
+    }
+
+    @RequestMapping(method = OPTIONS, params = "form=14", produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm14(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x) {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none"
+        );
+    }
+
+    @PutMapping(params = "form=15", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm15(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @DeleteMapping(params = "form=16", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm16(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @PatchMapping(params = "form=17", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm17(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @RequestMapping(method = OPTIONS, params = "form=18", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm18(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
     }
 }
