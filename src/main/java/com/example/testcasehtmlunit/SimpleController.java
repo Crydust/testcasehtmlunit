@@ -122,7 +122,7 @@ public class SimpleController {
                 <div id="form19">
                     <p>
                         file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
-                        <button type="button" onclick="submitFormWithFile('19', 'PUT');">Submit form <b>19</b> (put method with javascript returns XML)</button>
+                        <button type="button" onclick="submitFormWithFileAndReceiveXml('19', 'PUT');">Submit form <b>19</b> (put method with javascript returns XML)</button>
                     </p>
                 </div>
                 <div id="form20">
@@ -141,6 +141,12 @@ public class SimpleController {
                     <p>
                         file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
                         <button type="button" onclick="submitFormWithFileAndReceiveXml('22', 'OPTIONS');">Submit form <b>22</b> (options method with javascript returns XML)</button>
+                    </p>
+                </div>
+                <div id="form23">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFile('23', 'POST');">Submit form <b>23</b> (post method with javascript)</button>
                     </p>
                 </div>
                 <script>
@@ -219,8 +225,8 @@ public class SimpleController {
                         xhr.setRequestHeader('Accept', 'application/xml');
                         xhr.onreadystatechange = () => {
                             if (xhr.readyState === 4 && xhr.status === 200) {
-                                const data = xhr.responseText;
-                                ids.forEach(id => document.getElementById(id).textContent = data[id]);
+                                const data = xhr.responseXML;
+                                ids.forEach(id => document.getElementById(id).textContent = data.evaluate("//" + id + "/text()", data, null, XPathResult.STRING_TYPE, null).stringValue);
                                 ids.forEach(id => document.getElementById(id).style.display = '');
                             }
                         };
@@ -453,60 +459,72 @@ public class SimpleController {
 
     @PutMapping(params = "form=19", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
     @ResponseBody
-    public List<KeyValuePair> handleForm19(
+    public Map<String, String> handleForm19(
             String form,
             @RequestParam(name = "x", required = false) String[] x,
             @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-        return List.of(
-                new KeyValuePair("submittedForm", form),
-                new KeyValuePair("valuesOfX", String.join(", ", x)),
-                new KeyValuePair("fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none"),
-                new KeyValuePair("fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none")
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
         );
     }
 
     @DeleteMapping(params = "form=20", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
     @ResponseBody
-    public List<KeyValuePair> handleForm20(
+    public Map<String, String> handleForm20(
             String form,
             @RequestParam(name = "x", required = false) String[] x,
             @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-        return List.of(
-                new KeyValuePair("submittedForm", form),
-                new KeyValuePair("valuesOfX", String.join(", ", x)),
-                new KeyValuePair("fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none"),
-                new KeyValuePair("fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none")
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
         );
     }
 
     @PatchMapping(params = "form=21", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
     @ResponseBody
-    public List<KeyValuePair> handleForm21(
+    public Map<String, String> handleForm21(
             String form,
             @RequestParam(name = "x", required = false) String[] x,
             @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-        return List.of(
-                new KeyValuePair("submittedForm", form),
-                new KeyValuePair("valuesOfX", String.join(", ", x)),
-                new KeyValuePair("fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none"),
-                new KeyValuePair("fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none")
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
         );
     }
 
     @RequestMapping(method = OPTIONS, params = "form=22", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
     @ResponseBody
-    public List<KeyValuePair> handleForm22(
+    public Map<String, String> handleForm22(
             String form,
             @RequestParam(name = "x", required = false) String[] x,
             @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
-        return List.of(
-                new KeyValuePair("submittedForm", form),
-                new KeyValuePair("valuesOfX", String.join(", ", x)),
-                new KeyValuePair("fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none"),
-                new KeyValuePair("fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none")
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
         );
     }
 
-    public record KeyValuePair(String key, String value) {
+    @PostMapping(params = "form=23", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm23(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
     }
+
 }
