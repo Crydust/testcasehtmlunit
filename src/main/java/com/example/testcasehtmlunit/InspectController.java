@@ -60,12 +60,12 @@ public class InspectController {
                 </p>
                 <p>
                     Body: <select id='body'>
-                        <option value="">empty &quot;&quot;</option>
-                        <option value="p1=v1">oneParameter &quot;p1=v1&quot;</option>
-                        <option value="a=">emptyValue &quot;a=&quot;</option>
-                        <option value="a=b">sameAsInQuery &quot;a=b&quot;</option>
-                        <option value="a=other">sameKeyAsInQuery &quot;a=other&quot;</option>
-                        <option value="same=value1&amp;same=value2">sameKeyDifferentValues &quot;same=value1&amp;same=value2&quot;</option>
+                        <option value="">empty</option>
+                        <option value="p1=v1" title="p1=v1">oneParameter</option>
+                        <option value="a=" title=="a=">emptyValue</option>
+                        <option value="a=b" title="a=b">sameAsInQuery</option>
+                        <option value="a=other" title="a=other">sameKeyAsInQuery</option>
+                        <option value="same=value1&amp;same=value2" title="same=value1&amp;same=value2">sameKeyDifferentValues</option>
                     </select>
                 </p>
                 <p>
