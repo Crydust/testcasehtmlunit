@@ -28,13 +28,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
-/**
- * When using HtmlUnit ...
- * org.springframework.test.web.servlet.htmlunit.HtmlUnitRequestBuilder.buildRequest
- * org.springframework.test.web.servlet.htmlunit.HtmlUnitRequestBuilder.params
- * reads this.webRequest.getParameters(), but ignores query parameters?
- * org.htmlunit.WebRequest.getParameters ignores query string parameters for post?
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class InspectControllerTest {
