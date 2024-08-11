@@ -118,7 +118,7 @@ public class InspectController {
                         xhr.setRequestHeader('Cache-Control', 'no-cache');
                         if (encoding === 'multipart/form-data') {
                             // Warning: do NOT set the Content-Type header yourself!
-                        } else {
+                        } else if (method !== 'GET' && method !== 'HEAD') {
                             xhr.setRequestHeader('Content-Type', encoding);
                         }
                         xhr.setRequestHeader('Accept', accept);
@@ -169,17 +169,17 @@ public class InspectController {
     @RequestMapping(
             path = "/bounce",
             method = {GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE},
-            consumes = {APPLICATION_FORM_URLENCODED_VALUE, MULTIPART_FORM_DATA_VALUE},
+            //consumes = {APPLICATION_FORM_URLENCODED_VALUE, MULTIPART_FORM_DATA_VALUE},
             produces = {TEXT_HTML_VALUE, APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, TEXT_PLAIN_VALUE})
     @ResponseBody
-    public String bounce(HttpMethod method, WebRequest request, @RequestParam(name= "file", required = false) MultipartFile file, HttpSession session) {
+    public String bounce(HttpMethod method, WebRequest request, @RequestParam(name = "file", required = false) MultipartFile file, HttpSession session) {
         StringBuilder sb = new StringBuilder();
         sb.append("Parameters: \n");
 
         for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
             String key = entry.getKey();
-            sb.append("  '").append(key).append("': [");
             String[] values = entry.getValue();
+            sb.append("  '").append(key).append("': [");
             if (values == null) {
                 sb.append("null");
             } else {
@@ -194,7 +194,7 @@ public class InspectController {
         }
 
         if (file != null) {
-                sb.append("  '").append(file.getName()).append("': '").append(file.getOriginalFilename()).append("'\n");
+            sb.append("  '").append(file.getName()).append("': '").append(file.getOriginalFilename()).append("'\n");
         }
 
         session.setAttribute("previousParameters", sb.toString());
