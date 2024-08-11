@@ -144,8 +144,8 @@ public class InspectController {
                             }
                         };
                         xhr.onerror = () => {
-                                document.getElementById('output').textContent = 'Error ?';
-                                document.getElementById('output').style.display = '';
+                            document.getElementById('output').textContent = 'Error ?';
+                            document.getElementById('output').style.display = '';
                         };
                         xhr.send(data);
                     }
