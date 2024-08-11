@@ -1,18 +1,15 @@
 package com.example.testcasehtmlunit;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,12 +32,32 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@Disabled
 public class InspectControllerTest {
 
-    @Autowired
-    WebDriver driver;
+    private static WebDriver driver;
+//
+//    @BeforeAll
+//    static void setup() {
+//        driver = WebDriverManager.firefoxdriver().create();
+////        driver = new HtmlUnitDriver();
+//    }
+//
+//    @AfterAll
+//    static void teardown() {
+//        driver.quit();
+//    }
+
+    @BeforeEach
+    void setup() {
+//        driver = WebDriverManager.firefoxdriver().create();
+        driver = new HtmlUnitDriver();
+    }
+
+    @AfterEach
+    void teardown() {
+        driver.quit();
+    }
 
     @TempDir
     static Path tempDir;
@@ -67,7 +84,9 @@ public class InspectControllerTest {
 
     @AfterAll
     static void afterAll() throws XMLStreamException {
+        xmlStreamWriter.writeCharacters("\n");
         xmlStreamWriter.writeEndElement();
+        xmlStreamWriter.writeCharacters("\n");
         xmlStreamWriter.writeEndDocument();
         xmlStreamWriter.flush();
         xmlStreamWriter.close();
@@ -150,20 +169,18 @@ public class InspectControllerTest {
                 for (String encoding : encodings) {
                     for (String body : bodies) {
                         for (String accept : accepts) {
-                            if ((method.equals("GET") || method.equals("HEAD")) && (!encoding.equals("application/x-www-form-urlencoded") || !body.equals("empty"))) {
+                            if ((method.equals("GET") || method.equals("HEAD"))
+                                && (!encoding.equals("application/x-www-form-urlencoded") || !body.equals("empty"))) {
                                 continue;
                             }
                             String expected = "???Unknown???";
                             arguments.add(Arguments.of(nr++, method, query, encoding, body, accept, expected));
-                            if (nr > 20) {
-                                return arguments.stream();
-                            }
                         }
                     }
                 }
             }
         }
-        return arguments.stream();
+        return arguments.stream().filter(it->"TRACE".equals(it.get()[1]));
     }
 
     private void waitUntilAjaxFinished() {

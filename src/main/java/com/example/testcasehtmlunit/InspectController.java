@@ -79,7 +79,7 @@ public class InspectController {
                 <p>
                     <button type='button' id='button' onclick='handleButtonClick()'>Click me!</button>
                 </p>
-                <pre id='output' style='border: 1px solid #ccc; padding: 1em;'></pre>
+                <pre id='output' style='border: 1px solid #ccc; padding: 1em; display: none;'></pre>
                 <script>
                     function handleButtonClick() {
                         document.getElementById('output').style.display = 'none';
@@ -96,6 +96,11 @@ public class InspectController {
                         if (method === 'PATCH') {
                             method = 'POST';
                             data.append('_method', 'PATCH');
+                        }
+                        // something goes wrong with trace requests
+                        if (method === 'TRACE') {
+                            method = 'POST';
+                            data.append('_method', 'TRACE');
                         }
                         if (method === 'GET' || method === 'HEAD') {
                             data = null;
