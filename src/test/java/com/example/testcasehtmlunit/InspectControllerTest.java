@@ -1,7 +1,7 @@
 package com.example.testcasehtmlunit;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,13 +14,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -39,15 +46,36 @@ public class InspectControllerTest {
     static Path tempDir;
     static Path tempFile;
 
+    static Lock lock = new ReentrantLock();
+    static BufferedWriter bufferedWriter;
+    static XMLStreamWriter xmlStreamWriter;
+
     @BeforeAll
-    static void beforeAll() throws IOException {
+    static void createTempFile() throws IOException {
         tempFile = tempDir.resolve("example.txt");
         Files.writeString(tempFile, "Hello world!", StandardCharsets.US_ASCII);
     }
 
-    @ParameterizedTest
+    @BeforeAll
+    static void openOutputFile() throws Exception {
+        bufferedWriter = Files.newBufferedWriter(Path.of("output-" + LocalDateTime.now().toString().replaceAll("[^-.0-9A-Za-z]+", "-") + ".xml"), StandardCharsets.UTF_8);
+        xmlStreamWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(bufferedWriter);
+        xmlStreamWriter.writeStartDocument();
+        xmlStreamWriter.writeCharacters("\n");
+        xmlStreamWriter.writeStartElement("root");
+    }
+
+    @AfterAll
+    static void afterAll() throws XMLStreamException {
+        xmlStreamWriter.writeEndElement();
+        xmlStreamWriter.writeEndDocument();
+        xmlStreamWriter.flush();
+        xmlStreamWriter.close();
+    }
+
+    @ParameterizedTest(name = "{0}: method={1}, query={2}, encoding={3}, body={4}, accept={5}")
     @MethodSource("factory")
-    void isBlank_ShouldReturnTrueForNullOrBlankStrings(String method, String query, String encoding, String body, String accept, String expected) {
+    void isBlank_ShouldReturnTrueForNullOrBlankStrings(int nr, String method, String query, String encoding, String body, String accept, String expected) throws Exception {
         driver.get("http://localhost:8080/form");
         new Select(driver.findElement(By.id("method"))).selectByVisibleText(method);
         new Select(driver.findElement(By.id("query"))).selectByVisibleText(query);
@@ -60,10 +88,57 @@ public class InspectControllerTest {
         waitUntilAjaxFinished();
 
         String actual = driver.findElement(By.id("output")).getText();
+
+        writeArguments(nr, method, query, encoding, body, accept, expected, actual);
         assertThat(actual, is(expected));
     }
 
+    private static void writeArguments(int nr, String method, String query, String encoding, String body, String accept, String expected, String actual) throws XMLStreamException {
+        lock.lock();
+        try {
+            xmlStreamWriter.writeCharacters("\n  ");
+            xmlStreamWriter.writeStartElement("arguments");
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("nr");
+            xmlStreamWriter.writeCharacters(String.valueOf(nr));
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("method");
+            xmlStreamWriter.writeCharacters(method);
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("query");
+            xmlStreamWriter.writeCharacters(query);
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("encoding");
+            xmlStreamWriter.writeCharacters(encoding);
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("body");
+            xmlStreamWriter.writeCharacters(body);
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("accept");
+            xmlStreamWriter.writeCharacters(accept);
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("expected");
+            xmlStreamWriter.writeCharacters(expected);
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n    ");
+            xmlStreamWriter.writeStartElement("actual");
+            xmlStreamWriter.writeCharacters(actual);
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeCharacters("\n  ");
+            xmlStreamWriter.writeEndElement();
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public static Stream<Arguments> factory() {
+        int nr = 0;
         final String[] methods = {"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE"};
         final String[] queries = {"", "?a=b", "?a=b&c=d", "?a=", "?a", "?", "?a=b&a=d"};
         final String[] encodings = {"application/x-www-form-urlencoded", "multipart/form-data", "text/plain"};
@@ -79,7 +154,10 @@ public class InspectControllerTest {
                                 continue;
                             }
                             String expected = "???Unknown???";
-                            arguments.add(Arguments.of(method, query, encoding, body, accept, expected));
+                            arguments.add(Arguments.of(nr++, method, query, encoding, body, accept, expected));
+                            if (nr > 20) {
+                                return arguments.stream();
+                            }
                         }
                     }
                 }
