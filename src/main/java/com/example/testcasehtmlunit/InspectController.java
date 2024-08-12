@@ -91,19 +91,25 @@ public class InspectController {
                         let file = fileInput.files.length === 0 ? null : fileInput.files[0];
                         let body = document.getElementById('body').value;
                         let accept = document.getElementById('accept').value;
-                        let data = (encoding === 'multipart/form-data') ? new FormData() : new URLSearchParams();
+                        let data = null;
+                        if (method === 'GET' || method === 'HEAD') {
+                            data = null;
+                        } else if (encoding === 'application/x-www-form-urlencoded') {
+                            data = new URLSearchParams();
+                        } else if (encoding === 'multipart/form-data') {
+                            data = new FormData();
+                        } else {
+                            data = null;
+                        }
                         // for some reason spring boot dislikes the "patch" method
-                        if (method === 'PATCH') {
+                        if (data !== null && method === 'PATCH') {
                             method = 'POST';
                             data.append('_method', 'PATCH');
                         }
                         // something goes wrong with trace requests
-                        if (method === 'TRACE') {
+                        if (data !== null && method === 'TRACE') {
                             method = 'POST';
                             data.append('_method', 'TRACE');
-                        }
-                        if (method === 'GET' || method === 'HEAD') {
-                            data = null;
                         }
                         let url = '/bounce' + query;
                         if (data !== null){
@@ -114,9 +120,9 @@ public class InspectController {
                                 let [key, value] = pair.split('=');
                                 data.append(key, value === undefined ? '' : value);
                             });
-                            if (encoding === 'multipart/form-data' && file !== null) {
-                                data.append('file', file);
-                            }
+                        }
+                        if (data !== null && encoding === 'multipart/form-data' && file !== null) {
+                            data.append('file', file);
                         }
                         let xhr = new XMLHttpRequest();
                         xhr.open(method, url, true);
