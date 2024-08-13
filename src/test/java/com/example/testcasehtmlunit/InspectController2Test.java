@@ -48,9 +48,7 @@ public class InspectController2Test {
     static Path tempDir;
     static Path tempFile;
 
-    static Lock lock = new ReentrantLock();
-    static BufferedWriter bufferedWriter;
-    static XMLStreamWriter xmlStreamWriter;
+    private static final ArgumentsXmlDocument output = new ArgumentsXmlDocument();
 
     @BeforeAll
     static void createTempFile() throws IOException {
@@ -60,31 +58,12 @@ public class InspectController2Test {
 
     @BeforeAll
     static void openOutputFile() throws Exception {
-        lock.lock();
-        try {
-            bufferedWriter = Files.newBufferedWriter(Path.of("output-" + LocalDateTime.now().toString().replaceAll("[^-.0-9A-Za-z]+", "-") + ".xml"), StandardCharsets.UTF_8);
-            xmlStreamWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(bufferedWriter);
-            xmlStreamWriter.writeStartDocument();
-            xmlStreamWriter.writeCharacters("\n");
-            xmlStreamWriter.writeStartElement("root");
-        } finally {
-            lock.unlock();
-        }
+        output.writeStart();
     }
 
     @AfterAll
-    static void afterAll() throws XMLStreamException {
-        lock.lock();
-        try {
-            xmlStreamWriter.writeCharacters("\n");
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n");
-            xmlStreamWriter.writeEndDocument();
-            xmlStreamWriter.flush();
-            xmlStreamWriter.close();
-        } finally {
-            lock.unlock();
-        }
+    static void afterAll() throws Exception {
+        output.close();
     }
 
     @ParameterizedTest(name = "{0}: method={1}, query={2}, encoding={3}, body={4}, accept={5}")
@@ -103,53 +82,8 @@ public class InspectController2Test {
 
         String actual = driver.findElement(By.id("output")).getText();
 
-        writeArguments(nr, method, query, encoding, body, accept, expected, actual);
+        output.writeArguments(nr, method, query, encoding, body, accept, expected, actual);
         assertThat(actual, is(expected));
-    }
-
-    private static void writeArguments(int nr, String method, String query, String encoding, String body, String accept, String expected, String actual) throws XMLStreamException {
-        lock.lock();
-        try {
-            xmlStreamWriter.writeCharacters("\n  ");
-            xmlStreamWriter.writeStartElement("arguments");
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("nr");
-            xmlStreamWriter.writeCharacters(String.valueOf(nr));
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("method");
-            xmlStreamWriter.writeCharacters(method);
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("query");
-            xmlStreamWriter.writeCharacters(query);
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("encoding");
-            xmlStreamWriter.writeCharacters(encoding);
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("body");
-            xmlStreamWriter.writeCharacters(body);
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("accept");
-            xmlStreamWriter.writeCharacters(accept);
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeComment("expected: " + expected);
-//            xmlStreamWriter.writeStartElement("expected");
-//            xmlStreamWriter.writeCharacters(expected);
-//            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("actual");
-            xmlStreamWriter.writeCharacters(actual);
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeCharacters("\n  ");
-            xmlStreamWriter.writeEndElement();
-        } finally {
-            lock.unlock();
-        }
     }
 
     public static Stream<Arguments> factory() throws Exception {
@@ -250,7 +184,9 @@ public class InspectController2Test {
         return arguments.stream()
 //                .filter(it -> Integer.valueOf(108).equals(it.get()[0]))
 //                .filter(it -> Integer.valueOf(877).equals(it.get()[0]))
-                .sorted(comparingInt(it -> (int) it.get()[0]));
+//                .sorted(comparingInt(it -> (int) it.get()[0]))
+//                .limit(100)
+                ;
     }
 
     private void waitUntilAjaxFinished() {
