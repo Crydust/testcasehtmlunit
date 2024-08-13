@@ -125,7 +125,10 @@ public class InspectController {
                             data.append('file', file);
                         }
                         let xhr = new XMLHttpRequest();
-                        xhr.open(method, url, true);
+                        // async is slow
+                        //xhr.open(method, url, true);
+                        // using sync speeds up testing
+                        xhr.open(method, url, false);
                         xhr.setRequestHeader('Cache-Control', 'no-cache');
                         if (encoding === 'multipart/form-data') {
                             // Warning: do NOT set the Content-Type header yourself!
