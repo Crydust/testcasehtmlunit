@@ -163,7 +163,7 @@ public class InspectController {
                         };
                         // not strictly necessary, but htmlunit ignores the 'Content-Type' header when data is URLSearchParams or FormData
                         if (data !== null && encoding === "text/plain") {
-                            xhr.send(data.toString());
+                            xhr.send(null);
                         } else {
                             xhr.send(data);
                         }

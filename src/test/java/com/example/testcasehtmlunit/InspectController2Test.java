@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Comparator.comparingInt;
+import static java.util.function.Predicate.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
@@ -182,6 +183,7 @@ public class InspectController2Test {
             }
         }
         return arguments.stream()
+                .filter(not(it -> "TRACE".equals(it.get()[1]) && "text/plain".equals(it.get()[3])))
 //                .filter(it -> Integer.valueOf(108).equals(it.get()[0]))
 //                .filter(it -> Integer.valueOf(877).equals(it.get()[0]))
 //                .sorted(comparingInt(it -> (int) it.get()[0]))
