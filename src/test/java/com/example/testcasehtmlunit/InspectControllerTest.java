@@ -142,9 +142,10 @@ public class InspectControllerTest {
             xmlStreamWriter.writeCharacters(accept);
             xmlStreamWriter.writeEndElement();
             xmlStreamWriter.writeCharacters("\n    ");
-            xmlStreamWriter.writeStartElement("expected");
-            xmlStreamWriter.writeCharacters(expected);
-            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeComment("expected: " + expected);
+//            xmlStreamWriter.writeStartElement("expected");
+//            xmlStreamWriter.writeCharacters(expected);
+//            xmlStreamWriter.writeEndElement();
             xmlStreamWriter.writeCharacters("\n    ");
             xmlStreamWriter.writeStartElement("actual");
             xmlStreamWriter.writeCharacters(actual);
