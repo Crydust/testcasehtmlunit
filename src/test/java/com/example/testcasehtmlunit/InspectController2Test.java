@@ -247,7 +247,10 @@ public class InspectController2Test {
                 }
             }
         }
-        return arguments.stream().sorted(comparingInt(it -> (int) it.get()[0]));
+        return arguments.stream()
+//                .filter(it -> Integer.valueOf(108).equals(it.get()[0]))
+//                .filter(it -> Integer.valueOf(877).equals(it.get()[0]))
+                .sorted(comparingInt(it -> (int) it.get()[0]));
     }
 
     private void waitUntilAjaxFinished() {
