@@ -158,7 +158,12 @@ public class InspectController {
                             document.getElementById('output').textContent = 'Error ?';
                             document.getElementById('output').style.display = '';
                         };
-                        xhr.send(data);
+                        // not strictly necessary, but htmlunit ignores the 'Content-Type' header when data is URLSearchParams or FormData
+                        if (data !== null && encoding === "text/plain") {
+                            xhr.send(data.toString());
+                        } else {
+                            xhr.send(data);
+                        }
                     }
                 </script>
             </body>
