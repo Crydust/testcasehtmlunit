@@ -214,9 +214,9 @@ public class InspectController {
         }
 
         session.setAttribute("previousParameters", sb.toString());
-        System.out.println("==================================");
-        System.out.println(sb);
-        System.out.println("==================================");
+//        System.out.println("==================================");
+//        System.out.println(sb);
+//        System.out.println("==================================");
         if (method == HttpMethod.HEAD) {
             return null;
         }
