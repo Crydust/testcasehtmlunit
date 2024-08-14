@@ -117,7 +117,7 @@ public class InspectController2Test {
 
         final List<Arguments> arguments = new ArrayList<>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        try (InputStream in = InspectController2Test.class.getResourceAsStream("/OutputFromFirefox.xml")) {
+        try (InputStream in = InspectController2Test.class.getResourceAsStream("/OutputFromFirefox2.xml")) {
             StringBuilder sb = new StringBuilder();
             int nr = -1;
             String method = "";
