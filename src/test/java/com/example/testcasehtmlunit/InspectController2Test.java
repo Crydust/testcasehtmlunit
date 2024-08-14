@@ -133,47 +133,19 @@ public class InspectController2Test {
                 while (reader.hasNext()) {
                     XMLEvent nextEvent = reader.nextEvent();
                     if (nextEvent.isStartElement()) {
-                        var startElement = nextEvent.asStartElement();
-                        switch (startElement.getName().getLocalPart()) {
-                            case "nr":
-                            case "method":
-                            case "query":
-                            case "encoding":
-                            case "body":
-                            case "accept":
-                            case "actual":
-                                sb.setLength(0);
-                                break;
-                        }
+                        sb.setLength(0);
                     } else if (nextEvent.isCharacters()) {
                         sb.append(nextEvent.asCharacters().getData());
                     } else if (nextEvent.isEndElement()) {
-                        EndElement endElement = nextEvent.asEndElement();
-                        switch (endElement.getName().getLocalPart()) {
-                            case "nr":
-                                nr = Integer.parseInt(sb.toString());
-                                break;
-                            case "method":
-                                method = sb.toString();
-                                break;
-                            case "query":
-                                query = sb.toString();
-                                break;
-                            case "encoding":
-                                encoding = sb.toString();
-                                break;
-                            case "body":
-                                body = sb.toString();
-                                break;
-                            case "accept":
-                                accept = sb.toString();
-                                break;
-                            case "actual":
-                                actual = sb.toString();
-                                break;
-                            case "arguments":
-                                arguments.add(Arguments.of(nr, method, query, encoding, body, accept, actual));
-                                break;
+                        switch (nextEvent.asEndElement().getName().getLocalPart()) {
+                            case "nr" -> nr = Integer.parseInt(sb.toString());
+                            case "method" -> method = sb.toString();
+                            case "query" -> query = sb.toString();
+                            case "encoding" -> encoding = sb.toString();
+                            case "body" -> body = sb.toString();
+                            case "accept" -> accept = sb.toString();
+                            case "actual" -> actual = sb.toString();
+                            case "arguments" -> arguments.add(Arguments.of(nr, method, query, encoding, body, accept, actual));
                         }
                     }
                 }
