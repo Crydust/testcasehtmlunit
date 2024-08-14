@@ -1,19 +1,17 @@
 package com.example.testcasehtmlunit;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.Objects.requireNonNullElse;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
@@ -121,6 +119,36 @@ public class SimpleController {
                         <button type="button" onclick="submitFormWithFile('18', 'OPTIONS');">Submit form <b>18</b> (options method with javascript)</button>
                     </p>
                 </div>
+                <div id="form19">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFileAndReceiveXml('19', 'PUT');">Submit form <b>19</b> (put method with javascript returns XML)</button>
+                    </p>
+                </div>
+                <div id="form20">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFileAndReceiveXml('20', 'DELETE');">Submit form <b>20</b> (delete method with javascript returns XML)</button>
+                    </p>
+                </div>
+                <div id="form21">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFileAndReceiveXml('21', 'PATCH');">Submit form <b>21</b> (patch method with javascript returns XML, warning: PATCH is weird)</button>
+                    </p>
+                </div>
+                <div id="form22">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFileAndReceiveXml('22', 'OPTIONS');">Submit form <b>22</b> (options method with javascript returns XML)</button>
+                    </p>
+                </div>
+                <div id="form23">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFile('23', 'POST');">Submit form <b>23</b> (post method with javascript)</button>
+                    </p>
+                </div>
                 <script>
                     function submitForm(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
@@ -175,6 +203,36 @@ public class SimpleController {
                         };
                         xhr.send(body);
                     }
+                    function submitFormWithFileAndReceiveXml(form, method) {
+                        let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
+                        ids.forEach(id => document.getElementById(id).style.display = 'none');
+                        ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
+                        let body = new FormData();
+                        body.append('x', 'body');
+                        let fileInput = document.querySelector('#form' + form + ' input[name="file"]');
+                        if (fileInput.files.length !== 0) {
+                            body.append('file', fileInput.files[0]);
+                        }
+                        // for some reason spring boot dislikes the "patch" method
+                        if (method === 'PATCH') {
+                            method = 'POST';
+                            body.append('_method', 'PATCH');
+                        }
+                        let xhr = new XMLHttpRequest();
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        // Warning: do NOT set the Content-Type header yourself!
+                        // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+                        xhr.setRequestHeader('Accept', 'application/xml');
+                        xhr.onreadystatechange = () => {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                const data = xhr.responseXML;
+                                ids.forEach(id => document.getElementById(id).textContent = data.evaluate("//" + id + "/text()", data, null, XPathResult.STRING_TYPE, null).stringValue);
+                                ids.forEach(id => document.getElementById(id).style.display = '');
+                            }
+                        };
+                        xhr.send(body);
+                    }
+        
                 </script>
             </body>
             </html>
@@ -398,4 +456,75 @@ public class SimpleController {
                 "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
         );
     }
+
+    @PutMapping(params = "form=19", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm19(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @DeleteMapping(params = "form=20", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm20(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @PatchMapping(params = "form=21", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm21(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @RequestMapping(method = OPTIONS, params = "form=22", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_XML_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm22(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @PostMapping(params = "form=23", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm23(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
 }
