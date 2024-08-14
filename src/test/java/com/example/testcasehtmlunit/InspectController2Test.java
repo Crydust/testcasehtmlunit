@@ -31,6 +31,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Comparator.comparingInt;
 import static java.util.function.Predicate.not;
@@ -192,7 +193,7 @@ public class InspectController2Test {
     }
 
     private void waitUntilAjaxFinished() {
-        new WebDriverWait(driver, Duration.of(2, SECONDS))
+        new WebDriverWait(driver, Duration.of(2, SECONDS), Duration.of(100, MILLIS))
                 .until(visibilityOfElementLocated(By.id("output")));
     }
 
