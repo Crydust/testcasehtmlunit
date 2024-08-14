@@ -14,26 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.xml.stream.*;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.XMLEvent;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static java.util.Comparator.comparingInt;
 import static java.util.function.Predicate.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -89,72 +79,7 @@ public class InspectController2Test {
     }
 
     public static Stream<Arguments> factory() throws Exception {
-//        int nr = 0;
-//        final String[] methods = {"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE"};
-//        final String[] queries = {"", "?a=b", "?a=b&c=d", "?a=", "?a", "?", "?a=b&a=d"};
-//        final String[] encodings = {"application/x-www-form-urlencoded", "multipart/form-data", "text/plain"};
-//        final String[] bodies = {"empty", "oneParameter", "emptyValue", "sameAsInQuery", "sameKeyAsInQuery", "sameKeyDifferentValues"};
-//        final String[] accepts = {"text/html", "application/json", "application/xml", "text/plain"};
-//        final List<Arguments> arguments = new ArrayList<>();
-//        for (String method : methods) {
-//            for (String query : queries) {
-//                for (String encoding : encodings) {
-//                    for (String body : bodies) {
-//                        for (String accept : accepts) {
-//                            if ((method.equals("GET") || method.equals("HEAD")) && (!encoding.equals("application/x-www-form-urlencoded") || !body.equals("empty"))) {
-//                                continue;
-//                            }
-//                            String expected = "???Unknown???";
-//                            arguments.add(Arguments.of(nr++, method, query, encoding, body, accept, expected));
-//                            if (nr > 20) {
-//                                return arguments.stream();
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return arguments.stream();
-
-        final List<Arguments> arguments = new ArrayList<>();
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        try (InputStream in = InspectController2Test.class.getResourceAsStream("/OutputFromFirefox2.xml")) {
-            StringBuilder sb = new StringBuilder();
-            int nr = -1;
-            String method = "";
-            String query = "";
-            String encoding = "";
-            String body = "";
-            String accept = "";
-            String actual = "";
-            XMLEventReader reader = null;
-            try {
-                reader = xmlInputFactory.createXMLEventReader(in);
-                while (reader.hasNext()) {
-                    XMLEvent nextEvent = reader.nextEvent();
-                    if (nextEvent.isStartElement()) {
-                        sb.setLength(0);
-                    } else if (nextEvent.isCharacters()) {
-                        sb.append(nextEvent.asCharacters().getData());
-                    } else if (nextEvent.isEndElement()) {
-                        switch (nextEvent.asEndElement().getName().getLocalPart()) {
-                            case "nr" -> nr = Integer.parseInt(sb.toString());
-                            case "method" -> method = sb.toString();
-                            case "query" -> query = sb.toString();
-                            case "encoding" -> encoding = sb.toString();
-                            case "body" -> body = sb.toString();
-                            case "accept" -> accept = sb.toString();
-                            case "actual" -> actual = sb.toString();
-                            case "arguments" -> arguments.add(Arguments.of(nr, method, query, encoding, body, accept, actual));
-                        }
-                    }
-                }
-            } finally {
-                if (reader != null) {
-                    reader.close();
-                }
-            }
-        }
+        final List<Arguments> arguments = ArgumentsXmlDocument.readArguments("/OutputFromFirefox2.xml");
         return arguments.stream()
                 .filter(not(it -> "TRACE".equals(it.get()[1]) && "text/plain".equals(it.get()[3])))
 //                .filter(it -> Integer.valueOf(108).equals(it.get()[0]))
