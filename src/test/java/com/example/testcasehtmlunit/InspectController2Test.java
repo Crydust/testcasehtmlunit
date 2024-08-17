@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.function.Predicate.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -90,7 +89,7 @@ public class InspectController2Test {
     }
 
     private void waitUntilAjaxFinished() {
-        new WebDriverWait(driver, Duration.of(2, SECONDS), Duration.of(100, MILLIS))
+        new WebDriverWait(driver, Duration.of(2, SECONDS))
                 .until(visibilityOfElementLocated(By.id("output")));
     }
 

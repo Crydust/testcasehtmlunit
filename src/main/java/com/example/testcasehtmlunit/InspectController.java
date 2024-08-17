@@ -140,7 +140,10 @@ public class InspectController {
                             if (xhr.status >= 200 && xhr.status < 300) {
                                 if (method === 'HEAD') {
                                     let xhr2 = new XMLHttpRequest();
-                                    xhr2.open('GET', '/previousParameters', true);
+                                    // async is slow
+                                    //xhr2.open('GET', '/previousParameters', true);
+                                    // using sync speeds up testing
+                                    xhr2.open('GET', '/previousParameters', false);
                                     xhr2.onload = () => {
                                         if (xhr2.status >= 200 && xhr2.status < 300) {
                                             document.getElementById('output').textContent = xhr2.responseText;
