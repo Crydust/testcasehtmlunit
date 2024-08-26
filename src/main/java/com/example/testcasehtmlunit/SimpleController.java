@@ -33,6 +33,7 @@ public class SimpleController {
                  the values of 'x' are: <b id="valuesOfX">%s</b>,<br>
                  the uploaded file name is: <b id="fileName">%s</b>,<br>
                  the uploaded file contents is: <b id="fileContents">%s</b>.</p>
+                 the json contents is: <b id="json">%s</b>.</p>
                 <form action="?form=1" method="post" id="form1">
                     <p><button type="submit">Submit form <b>1</b> (form has query parameter in action)</button></p>
                 </form>
@@ -149,9 +150,16 @@ public class SimpleController {
                         <button type="button" onclick="submitFormWithFile('23', 'POST');">Submit form <b>23</b> (post method with javascript)</button>
                     </p>
                 </div>
+                <div id="form24">
+                    <p>
+                        file: <input type="file" name="file">  (we assume an ascii encoded text-file will be uploaded)<br>
+                        <button type="button" onclick="submitFormWithFileAndJson('24', 'POST');">Submit form <b>24</b> (post method with javascript combining file and some json)</button>
+                    </p>
+                </div>
                 <script>
                     function submitForm(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
+                        document.getElementById('json').textContent = 'none';
                         ids.forEach(id => document.getElementById(id).style.display = 'none');
                         ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
                         let body = new URLSearchParams();
@@ -176,6 +184,7 @@ public class SimpleController {
                     }
                     function submitFormWithFile(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
+                        document.getElementById('json').textContent = 'none';
                         ids.forEach(id => document.getElementById(id).style.display = 'none');
                         ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
                         let body = new FormData();
@@ -205,6 +214,7 @@ public class SimpleController {
                     }
                     function submitFormWithFileAndReceiveXml(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
+                        document.getElementById('json').textContent = 'none';
                         ids.forEach(id => document.getElementById(id).style.display = 'none');
                         ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
                         let body = new FormData();
@@ -232,7 +242,36 @@ public class SimpleController {
                         };
                         xhr.send(body);
                     }
-        
+                    function submitFormWithFileAndJson(form, method) {
+                        let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents', 'json'];
+                        ids.forEach(id => document.getElementById(id).style.display = 'none');
+                        ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
+                        let body = new FormData();
+                        body.append('x', 'body');
+                        let fileInput = document.querySelector('#form' + form + ' input[name="file"]');
+                        if (fileInput.files.length !== 0) {
+                            body.append('file', fileInput.files[0]);
+                        }
+                        // for some reason spring boot dislikes the "patch" method
+                        if (method === 'PATCH') {
+                            method = 'POST';
+                            body.append('_method', 'PATCH');
+                        }
+                        body.append('json', new Blob([JSON.stringify({"a":"b","x":"foo"})], {type: 'application/json'}));
+                        let xhr = new XMLHttpRequest();
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        // Warning: do NOT set the Content-Type header yourself!
+                        // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+                        xhr.setRequestHeader('Accept', 'application/json');
+                        xhr.onreadystatechange = () => {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                const data = JSON.parse(xhr.responseText);
+                                ids.forEach(id => document.getElementById(id).textContent = data[id]);
+                                ids.forEach(id => document.getElementById(id).style.display = '');
+                            }
+                        };
+                        xhr.send(body);
+                    }
                 </script>
             </body>
             </html>
@@ -245,16 +284,19 @@ public class SimpleController {
             @SessionAttribute(name = "valuesOfX", required = false) String valuesOfX,
             @SessionAttribute(name = "fileName", required = false) String fileName,
             @SessionAttribute(name = "fileContents", required = false) String fileContents,
+            @SessionAttribute(name = "json", required = false) String json,
             HttpSession session) {
         session.removeAttribute("submittedForm");
         session.removeAttribute("valuesOfX");
         session.removeAttribute("fileName");
         session.removeAttribute("fileContents");
+        session.removeAttribute("json");
         return HTML_TEMPLATE.formatted(
                 htmlEscape(requireNonNullElse(submittedForm, "none")),
                 htmlEscape(requireNonNullElse(valuesOfX, "none")),
                 htmlEscape(requireNonNullElse(fileName, "none")),
-                htmlEscape(requireNonNullElse(fileContents, "none"))
+                htmlEscape(requireNonNullElse(fileContents, "none")),
+                htmlEscape(requireNonNullElse(json, "none"))
         );
     }
 
@@ -524,6 +566,22 @@ public class SimpleController {
                 "valuesOfX", String.join(", ", x),
                 "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
                 "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none"
+        );
+    }
+
+    @PostMapping(params = "form=24", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm24(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestPart(name = "json", required = false) Map<String, String> json,
+            @RequestPart(name = "file", required = false) MultipartFile file) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
+                "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none",
+                "json", json != null ? json.toString() : "none"
         );
     }
 

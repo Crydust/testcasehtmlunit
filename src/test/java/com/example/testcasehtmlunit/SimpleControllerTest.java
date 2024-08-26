@@ -309,7 +309,6 @@ public class SimpleControllerTest {
         );
     }
 
-
     @Test
     void shouldHandleForm18(@TempDir Path tempDir) throws IOException {
         // fails with HtmlUnitRequestBuilder
@@ -331,6 +330,152 @@ public class SimpleControllerTest {
                 () -> assertThat(valuesOfX, is("body, query")),
                 () -> assertThat(fileName, is("example.txt")),
                 () -> assertThat(fileContents, is("Hello world!"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm19(@TempDir Path tempDir) throws IOException {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        Path tempFile = tempDir.resolve("example.txt");
+        Files.writeString(tempFile, "Hello world!", StandardCharsets.US_ASCII);
+        driver.findElement(By.cssSelector("#form19 input[name='file']")).sendKeys(tempFile.toAbsolutePath().toString());
+
+        driver.findElement(By.cssSelector("#form19 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        String fileName = driver.findElement(By.cssSelector("#fileName")).getText();
+        String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("19")),
+                () -> assertThat(valuesOfX, is("body, query")),
+                () -> assertThat(fileName, is("example.txt")),
+                () -> assertThat(fileContents, is("Hello world!"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm20(@TempDir Path tempDir) throws IOException {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        Path tempFile = tempDir.resolve("example.txt");
+        Files.writeString(tempFile, "Hello world!", StandardCharsets.US_ASCII);
+        driver.findElement(By.cssSelector("#form20 input[name='file']")).sendKeys(tempFile.toAbsolutePath().toString());
+
+        driver.findElement(By.cssSelector("#form20 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        String fileName = driver.findElement(By.cssSelector("#fileName")).getText();
+        String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("20")),
+                () -> assertThat(valuesOfX, is("body, query")),
+                () -> assertThat(fileName, is("example.txt")),
+                () -> assertThat(fileContents, is("Hello world!"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm21(@TempDir Path tempDir) throws IOException {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        Path tempFile = tempDir.resolve("example.txt");
+        Files.writeString(tempFile, "Hello world!", StandardCharsets.US_ASCII);
+        driver.findElement(By.cssSelector("#form21 input[name='file']")).sendKeys(tempFile.toAbsolutePath().toString());
+
+        driver.findElement(By.cssSelector("#form21 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        String fileName = driver.findElement(By.cssSelector("#fileName")).getText();
+        String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("21")),
+                () -> assertThat(valuesOfX, is("query, body")),
+                () -> assertThat(fileName, is("example.txt")),
+                () -> assertThat(fileContents, is("Hello world!"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm22(@TempDir Path tempDir) throws IOException {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        Path tempFile = tempDir.resolve("example.txt");
+        Files.writeString(tempFile, "Hello world!", StandardCharsets.US_ASCII);
+        driver.findElement(By.cssSelector("#form22 input[name='file']")).sendKeys(tempFile.toAbsolutePath().toString());
+
+        driver.findElement(By.cssSelector("#form22 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        String fileName = driver.findElement(By.cssSelector("#fileName")).getText();
+        String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("22")),
+                () -> assertThat(valuesOfX, is("body, query")),
+                () -> assertThat(fileName, is("example.txt")),
+                () -> assertThat(fileContents, is("Hello world!"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm23(@TempDir Path tempDir) throws IOException {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        Path tempFile = tempDir.resolve("example.txt");
+        Files.writeString(tempFile, "Hello world!", StandardCharsets.US_ASCII);
+        driver.findElement(By.cssSelector("#form23 input[name='file']")).sendKeys(tempFile.toAbsolutePath().toString());
+
+        driver.findElement(By.cssSelector("#form23 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        String fileName = driver.findElement(By.cssSelector("#fileName")).getText();
+        String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("23")),
+                () -> assertThat(valuesOfX, is("query, body")),
+                () -> assertThat(fileName, is("example.txt")),
+                () -> assertThat(fileContents, is("Hello world!"))
+        );
+    }
+
+    @Test
+    void shouldHandleForm24(@TempDir Path tempDir) throws IOException {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        Path tempFile = tempDir.resolve("example.txt");
+        Files.writeString(tempFile, "Hello world!", StandardCharsets.US_ASCII);
+        driver.findElement(By.cssSelector("#form24 input[name='file']")).sendKeys(tempFile.toAbsolutePath().toString());
+
+        driver.findElement(By.cssSelector("#form24 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        String fileName = driver.findElement(By.cssSelector("#fileName")).getText();
+        String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
+        String json = driver.findElement(By.cssSelector("#json")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("24")),
+                () -> assertThat(valuesOfX, is("body, query")),
+                () -> assertThat(fileName, is("example.txt")),
+                () -> assertThat(fileContents, is("Hello world!")),
+                () -> assertThat(json, is("{a=b, x=foo}"))
         );
     }
 
