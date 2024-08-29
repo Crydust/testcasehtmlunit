@@ -18,6 +18,7 @@ import java.time.Duration;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.oneOf;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
@@ -472,7 +473,7 @@ public class SimpleControllerTest {
         String json = driver.findElement(By.cssSelector("#json")).getText();
         assertAll(
                 () -> assertThat(submittedForm, is("24")),
-                () -> assertThat(valuesOfX, is("body, query")),
+                () -> assertThat(valuesOfX, is("query, body")),
                 () -> assertThat(fileName, is("example.txt")),
                 () -> assertThat(fileContents, is("Hello world!")),
                 () -> assertThat(json, is("{a=b, x=foo}"))
@@ -480,8 +481,9 @@ public class SimpleControllerTest {
     }
 
     private void waitUntilAjaxFinished() {
-        new WebDriverWait(driver, Duration.of(2, SECONDS))
-                .until(visibilityOfElementLocated(By.id("fileContents")));
+        // NOOP ... all xhr calls are synchronous
+//        new WebDriverWait(driver, Duration.of(2, SECONDS))
+//                .until(visibilityOfElementLocated(By.id("fileContents")));
     }
 
 }

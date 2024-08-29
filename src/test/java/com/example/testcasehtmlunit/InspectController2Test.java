@@ -89,8 +89,9 @@ public class InspectController2Test {
     }
 
     private void waitUntilAjaxFinished() {
-        new WebDriverWait(driver, Duration.of(2, SECONDS))
-                .until(visibilityOfElementLocated(By.id("output")));
+        // NOOP ... all xhr calls are synchronous
+//        new WebDriverWait(driver, Duration.of(2, SECONDS))
+//                .until(visibilityOfElementLocated(By.id("output")));
     }
 
 }
