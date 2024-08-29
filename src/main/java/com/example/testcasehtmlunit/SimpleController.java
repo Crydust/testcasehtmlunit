@@ -170,7 +170,7 @@ public class SimpleController {
                             body.append('_method', 'PATCH');
                         }
                         let xhr = new XMLHttpRequest();
-                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', false);
                         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                         xhr.setRequestHeader('Accept', 'application/json');
                         xhr.onreadystatechange = () => {
@@ -199,7 +199,7 @@ public class SimpleController {
                             body.append('_method', 'PATCH');
                         }
                         let xhr = new XMLHttpRequest();
-                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', false);
                         // Warning: do NOT set the Content-Type header yourself!
                         // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
                         xhr.setRequestHeader('Accept', 'application/json');
@@ -229,7 +229,7 @@ public class SimpleController {
                             body.append('_method', 'PATCH');
                         }
                         let xhr = new XMLHttpRequest();
-                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', false);
                         // Warning: do NOT set the Content-Type header yourself!
                         // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
                         xhr.setRequestHeader('Accept', 'application/xml');
@@ -259,7 +259,7 @@ public class SimpleController {
                         }
                         body.append('json', new Blob([JSON.stringify({"a":"b","x":"foo"})], {type: 'application/json'}));
                         let xhr = new XMLHttpRequest();
-                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', true);
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', false);
                         // Warning: do NOT set the Content-Type header yourself!
                         // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
                         xhr.setRequestHeader('Accept', 'application/json');
