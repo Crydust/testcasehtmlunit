@@ -155,6 +155,11 @@ public class SimpleController {
                         <button type="button" onclick="submitFormWithFileAndJson('24', 'POST');">Submit form <b>24</b> (post method with javascript combining file and some json)</button>
                     </p>
                 </div>
+                <div id="form25">
+                    <p>
+                        <button type="button" onclick="submitJson('25', 'POST');">Submit form <b>25</b> (post method with javascript and json body)</button>
+                    </p>
+                </div>
                 <script>
                     function submitForm(form, method) {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents'];
@@ -261,6 +266,29 @@ public class SimpleController {
                         xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', false);
                         // Warning: do NOT set the Content-Type header yourself!
                         // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+                        xhr.setRequestHeader('Accept', 'application/json');
+                        xhr.onreadystatechange = () => {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                const data = JSON.parse(xhr.responseText);
+                                ids.forEach(id => document.getElementById(id).textContent = data[id]);
+                                ids.forEach(id => document.getElementById(id).style.display = '');
+                            }
+                        };
+                        xhr.send(body);
+                    }
+                    function submitJson(form, method) {
+                        let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents', 'json'];
+                        ids.forEach(id => document.getElementById(id).style.display = 'none');
+                        ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
+                        // for some reason spring boot dislikes the "patch" method
+                        if (method === 'PATCH') {
+                            method = 'POST';
+                            body.append('_method', 'PATCH');
+                        }
+                        let body = JSON.stringify({"a":"b","x":"foo"});
+                        let xhr = new XMLHttpRequest();
+                        xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', false);
+                        xhr.setRequestHeader('Content-Type', 'application/json');
                         xhr.setRequestHeader('Accept', 'application/json');
                         xhr.onreadystatechange = () => {
                             if (xhr.readyState === 4 && xhr.status === 200) {
@@ -580,6 +608,21 @@ public class SimpleController {
                 "valuesOfX", String.join(", ", x),
                 "fileName", file != null && !file.isEmpty() ? requireNonNullElse(file.getOriginalFilename(), "null") : "none",
                 "fileContents", file != null && !file.isEmpty() ? new String(file.getBytes(), StandardCharsets.US_ASCII) : "none",
+                "json", json != null ? json.toString() : "none"
+        );
+    }
+
+    @PostMapping(params = "form=25", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> handleForm25(
+            String form,
+            @RequestParam(name = "x", required = false) String[] x,
+            @RequestBody(required = false) Map<String, String> json) throws IOException {
+        return Map.of(
+                "submittedForm", form,
+                "valuesOfX", String.join(", ", x),
+                "fileName", "none",
+                "fileContents", "none",
                 "json", json != null ? json.toString() : "none"
         );
     }

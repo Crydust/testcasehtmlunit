@@ -475,6 +475,28 @@ public class SimpleControllerTest {
         );
     }
 
+    @Test
+    void shouldHandleForm25(@TempDir Path tempDir) throws IOException {
+        // fails with HtmlUnitRequestBuilder
+        driver.get("http://localhost:8080/");
+
+        driver.findElement(By.cssSelector("#form25 button")).click();
+
+        waitUntilAjaxFinished();
+        String submittedForm = driver.findElement(By.cssSelector("#submittedForm")).getText();
+        String valuesOfX = driver.findElement(By.cssSelector("#valuesOfX")).getText();
+        String fileName = driver.findElement(By.cssSelector("#fileName")).getText();
+        String fileContents = driver.findElement(By.cssSelector("#fileContents")).getText();
+        String json = driver.findElement(By.cssSelector("#json")).getText();
+        assertAll(
+                () -> assertThat(submittedForm, is("25")),
+                () -> assertThat(valuesOfX, is("query")),
+                () -> assertThat(fileName, is("none")),
+                () -> assertThat(fileContents, is("none")),
+                () -> assertThat(json, is("{a=b, x=foo}"))
+        );
+    }
+
     private void waitUntilAjaxFinished() {
         // NOOP ... all xhr calls are synchronous
 //        new WebDriverWait(driver, Duration.of(2, SECONDS))
