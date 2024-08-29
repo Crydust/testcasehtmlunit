@@ -617,7 +617,7 @@ public class SimpleController {
     public Map<String, String> handleForm25(
             String form,
             @RequestParam(name = "x", required = false) String[] x,
-            @RequestBody(required = false) Map<String, String> json) throws IOException {
+            @RequestBody(required = false) Map<String, String> json) {
         return Map.of(
                 "submittedForm", form,
                 "valuesOfX", String.join(", ", x),
