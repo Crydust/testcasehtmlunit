@@ -476,7 +476,7 @@ public class SimpleControllerTest {
     }
 
     @Test
-    void shouldHandleForm25(@TempDir Path tempDir) throws IOException {
+    void shouldHandleForm25() {
         // fails with HtmlUnitRequestBuilder
         driver.get("http://localhost:8080/");
 
