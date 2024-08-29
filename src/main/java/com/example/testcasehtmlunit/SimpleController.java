@@ -280,11 +280,6 @@ public class SimpleController {
                         let ids = ['submittedForm', 'valuesOfX', 'fileName', 'fileContents', 'json'];
                         ids.forEach(id => document.getElementById(id).style.display = 'none');
                         ids.forEach(id => document.getElementById(id).textContent = 'Loading ...');
-                        // for some reason spring boot dislikes the "patch" method
-                        if (method === 'PATCH') {
-                            method = 'POST';
-                            body.append('_method', 'PATCH');
-                        }
                         let body = JSON.stringify({"a":"b","x":"foo"});
                         let xhr = new XMLHttpRequest();
                         xhr.open(method, '?form=' + encodeURIComponent(form) + '&x=query', false);
